@@ -83,4 +83,45 @@ public class API_AutomationTest {
     }
 
 
+    @Test
+    public void ValidateMessageBody()
+    {
+        RestAssured.baseURI = "http://dummy.restapiexample.com";
+        RequestSpecification httpRequest = RestAssured.given();
+        Response response = httpRequest.get("/api/v1/employee/7");
+        // Retrieve the body of the Response
+        ResponseBody body = response.getBody();
+        // To check for sub string presence get the Response body as a String.
+        // Do a String.contains
+        String bodyAsString = body.asString();
+        System.out.println(bodyAsString);
+        Assert.assertEquals(bodyAsString.contains("Herrod Chandler") /*Expected value*/, true /*Actual Value*/, "Response body contains Herrod Chandler");
+    }
+
+    @Test
+    public void DisplayAllNodesInUsersAPI() {
+        RestAssured.baseURI = "http://dummy.restapiexample.com";
+        RequestSpecification httpRequest = RestAssured.given();
+        Response response = httpRequest.get("/api/v1/employees");
+
+        // Get response from query and print
+        String abcd = given().log().all().queryParam("employee_name").header("Content-Type","application/json; charset=utf-8")
+                .when().get("/api/v1/employee/7")
+                .then().assertThat().statusCode(200).body("data \n" + "'employee_name' \n" + "'Herrod Chandler'", equalTo("Herrod Chandler"))
+                .header("server", "cloudflare").extract().response().asString();
+        System.out.println(abcd);
+
+
+        // First get the JsonPath object instance from the Response interface
+        JsonPath jsonPathEvaluator = response.jsonPath();
+        // Let us print the Name variable to see what we got
+        System.out.println("Id received from Response: " + jsonPathEvaluator.get("data \n" + "'id' \n" + "'7'"));
+        String name = jsonPathEvaluator.get("data \n" + "'id' \n" + "'7'");
+        // Validate the response
+        Assert.assertEquals(name, "7", "Correct name received in the Response");
+
+
+    }
+
+
 }
